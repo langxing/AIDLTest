@@ -24,19 +24,48 @@ class ShoppingCartViewModel : ViewModel() {
             is ShoppingCartIntent.loadData -> loadData()
             is ShoppingCartIntent.addGoods -> addGoods(intent)
             is ShoppingCartIntent.deleteGoods -> deleteGoods(intent)
-            else -> {}
+            is ShoppingCartIntent.updateQuantity -> updateQuantity(intent)
         }
     }
 
-    private fun updateStock(goods: Goods, stockChange: Int): List<Goods> {
+    private fun updateQuantity(intent: ShoppingCartIntent.updateQuantity) {
+        _state.update {
+            val selectList = it.selectGoods
+            val selectGoods = selectList.map { goods ->
+                if (goods.id == intent.goodsId) {
+                    goods.copy(quantity = goods.quantity + intent.quantity)
+                } else goods
+            }.filter { goods ->
+                goods.quantity > 0
+            }
+            val totalPrice = updateTotalPrice(selectGoods)
+            val goodsList = it.dataList.map {  goods ->
+                if (goods.id == intent.goodsId) {
+                    goods.copy(quantity = goods.quantity + intent.quantity)
+                } else goods
+            }
+            val dataList = updateStock(goodsList, intent.goodsId, - intent.quantity)
+            it.copy(totalPrice = totalPrice, selectGoods = selectGoods, dataList = dataList)
+        }
+    }
+
+    private fun updateStock(dataList: List<Goods>, goodsId: Int, stockChange: Int): List<Goods> {
         // 模拟刷新库存
-        val dataList = _state.value.dataList.map { item ->
-            if (item.id == goods.id) {
+        val goodsList = dataList.map { item ->
+            if (item.id == goodsId) {
                 // coerceAtLeast(0) 限制最小值为0
-                item.copy(quantity = (item.quantity + stockChange).coerceAtLeast(0))
+                item.copy(stock = (item.stock + stockChange).coerceAtLeast(0))
             } else item
         }
-        return dataList
+        return goodsList
+    }
+
+    private fun updateTotalPrice(selectList: List<Goods>): Double {
+        var totalPrice = 0.0
+        selectList.forEach { goods ->
+            totalPrice += goods.price * goods.quantity
+        }
+        return totalPrice
     }
 
     private fun deleteGoods(intent: ShoppingCartIntent.deleteGoods) {
@@ -45,8 +74,9 @@ class ShoppingCartViewModel : ViewModel() {
             val selectList = it.selectGoods.filterNot { item ->
                 item.id == goods.id
             }
-            val dataList = updateStock(intent.goods, + goods.quantity)
-            it.copy(selectGoods = selectList, dataList = dataList)
+            val totalPrice = updateTotalPrice(selectList)
+            val dataList = updateStock(it.dataList, intent.goods.id, + goods.quantity)
+            it.copy(totalPrice = totalPrice, selectGoods = selectList, dataList = dataList)
         }
     }
 
@@ -54,9 +84,20 @@ class ShoppingCartViewModel : ViewModel() {
         _state.update {
             val goods = intent.goods
             val list = it.selectGoods.toMutableList()
-            list.add(goods)
-            val dataList = updateStock(intent.goods, - goods.quantity)
-            it.copy(selectGoods = list, dataList = dataList)
+            // 检查购物车是否已有该商品
+            val isExisted = list.any { it.id == goods.id }
+            if (!isExisted) {
+                list.add(goods)
+            } else {
+                it.selectGoods.map { item ->
+                    if (item.id == goods.id) {
+                        item.copy(quantity = item.quantity + goods.quantity)
+                    } else item
+                }
+            }
+            val dataList = updateStock(it.dataList, intent.goods.id, - goods.quantity)
+            val totalPrice = updateTotalPrice(list)
+            it.copy(totalPrice = totalPrice, selectGoods = list, dataList = dataList)
         }
     }
 
