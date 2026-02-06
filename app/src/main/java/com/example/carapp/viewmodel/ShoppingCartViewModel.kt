@@ -75,27 +75,27 @@ class ShoppingCartViewModel : ViewModel() {
                 item.id == goods.id
             }
             val totalPrice = updateTotalPrice(selectList)
-            val dataList = updateStock(it.dataList, intent.goods.id, + goods.quantity)
+            val goodsList = it.dataList.map { item ->
+                if (item.id == goods.id) {
+                    item.copy(quantity = item.quantity - goods.quantity)
+                } else item
+            }
+            val dataList = updateStock(goodsList, intent.goods.id, + goods.quantity)
             it.copy(totalPrice = totalPrice, selectGoods = selectList, dataList = dataList)
         }
     }
 
     private fun addGoods(intent: ShoppingCartIntent.addGoods) {
         _state.update {
-            val goods = intent.goods
             val list = it.selectGoods.toMutableList()
-            // 检查购物车是否已有该商品
-            val isExisted = list.any { it.id == goods.id }
-            if (!isExisted) {
-                list.add(goods)
-            } else {
-                it.selectGoods.map { item ->
-                    if (item.id == goods.id) {
-                        item.copy(quantity = item.quantity + goods.quantity)
-                    } else item
-                }
+            val goods = intent.goods.copy(quantity = 1)
+            list.add(goods)
+            val goodsList = it.dataList.map { item ->
+                if (item.id == intent.goods.id) {
+                    item.copy(quantity = 1)
+                } else item
             }
-            val dataList = updateStock(it.dataList, intent.goods.id, - goods.quantity)
+            val dataList = updateStock(goodsList, intent.goods.id, - 1)
             val totalPrice = updateTotalPrice(list)
             it.copy(totalPrice = totalPrice, selectGoods = list, dataList = dataList)
         }

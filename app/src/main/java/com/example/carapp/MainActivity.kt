@@ -10,6 +10,7 @@ import android.os.RemoteException
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.carapp.databinding.ActivityMainBinding
+import com.example.carapp.ui.ShoppingCartActivity
 import com.example.sdk.CarInterface
 import com.example.sdk.ICarCallback
 import com.example.sdk.User
@@ -38,6 +39,9 @@ class MainActivity : AppCompatActivity() {
             } catch (e: RemoteException) {
                 Log.e("AIDL_ERROR", "调用远程方法失败", e)
             }
+        }
+        binding.tvMvi.setOnClickListener {
+            startActivity(Intent(this, ShoppingCartActivity::class.java))
         }
     }
 

@@ -36,6 +36,7 @@ class ShoppingCartAdapter : ListAdapter<Goods, ShoppingCartAdapter.ShoppingCartH
         holder.binding.apply {
             tvName.text = goods.name
             tvStock.text = "库存：${goods.stock}"
+            tvNum.text = "${goods.quantity}"
             tvPrice.text = "价格：￥${goods.price}"
         }
     }

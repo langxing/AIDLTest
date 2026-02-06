@@ -48,14 +48,14 @@ class ShoppingCartActivity : AppCompatActivity() {
             onMinus = { goods ->
                 if (goods.quantity == 1) {
                     viewModel.todoIntent(ShoppingCartIntent.deleteGoods(goods))
-                } else {
+                } else if (goods.quantity > 0) {
                     viewModel.todoIntent(ShoppingCartIntent.updateQuantity(goods.id, - 1))
                 }
             }
             onAdd = { goods ->
                 if (goods.quantity == 0) {
                     viewModel.todoIntent(ShoppingCartIntent.addGoods(goods))
-                } else {
+                } else if (goods.stock > 0) {
                     viewModel.todoIntent(ShoppingCartIntent.updateQuantity(goods.id, + 1))
                 }
             }
