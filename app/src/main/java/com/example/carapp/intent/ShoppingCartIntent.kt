@@ -4,12 +4,12 @@ import com.example.carapp.model.Goods
 
 sealed class ShoppingCartIntent {
 
-    data object loadData: ShoppingCartIntent()
+    data object LoadData: ShoppingCartIntent()
 
-    data class addGoods(val goods: Goods): ShoppingCartIntent()
+    data class AddGoods(val goods: Goods): ShoppingCartIntent()
 
-    data class deleteGoods(val goods: Goods): ShoppingCartIntent()
+    data class DeleteGoods(val goods: Goods): ShoppingCartIntent()
 
-    data class updateQuantity(val goodsId: Int, val quantity: Int): ShoppingCartIntent()
+    data class UpdateQuantity(val goodsId: Int, val quantity: Int): ShoppingCartIntent()
 
 }

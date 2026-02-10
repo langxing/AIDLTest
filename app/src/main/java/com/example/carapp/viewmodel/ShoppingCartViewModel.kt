@@ -21,14 +21,14 @@ class ShoppingCartViewModel : ViewModel() {
     // 执行意图
     fun todoIntent(intent: ShoppingCartIntent) {
         when (intent) {
-            is ShoppingCartIntent.loadData -> loadData()
-            is ShoppingCartIntent.addGoods -> addGoods(intent)
-            is ShoppingCartIntent.deleteGoods -> deleteGoods(intent)
-            is ShoppingCartIntent.updateQuantity -> updateQuantity(intent)
+            is ShoppingCartIntent.LoadData -> loadData()
+            is ShoppingCartIntent.AddGoods -> addGoods(intent)
+            is ShoppingCartIntent.DeleteGoods -> deleteGoods(intent)
+            is ShoppingCartIntent.UpdateQuantity -> updateQuantity(intent)
         }
     }
 
-    private fun updateQuantity(intent: ShoppingCartIntent.updateQuantity) {
+    private fun updateQuantity(intent: ShoppingCartIntent.UpdateQuantity) {
         _state.update {
             val selectList = it.selectGoods
             val selectGoods = selectList.map { goods ->
@@ -68,7 +68,7 @@ class ShoppingCartViewModel : ViewModel() {
         return totalPrice
     }
 
-    private fun deleteGoods(intent: ShoppingCartIntent.deleteGoods) {
+    private fun deleteGoods(intent: ShoppingCartIntent.DeleteGoods) {
         _state.update {
             val goods = intent.goods
             val selectList = it.selectGoods.filterNot { item ->
@@ -85,7 +85,7 @@ class ShoppingCartViewModel : ViewModel() {
         }
     }
 
-    private fun addGoods(intent: ShoppingCartIntent.addGoods) {
+    private fun addGoods(intent: ShoppingCartIntent.AddGoods) {
         _state.update {
             val list = it.selectGoods.toMutableList()
             val goods = intent.goods.copy(quantity = 1)

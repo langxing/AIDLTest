@@ -28,7 +28,7 @@ class ShoppingCartActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.recyclerview.adapter = adapter
         binding.recyclerview.layoutManager = LinearLayoutManager(this)
-        viewModel.todoIntent(ShoppingCartIntent.loadData)
+        viewModel.todoIntent(ShoppingCartIntent.LoadData)
         lifecycleScope.launch {
             // 只有在 Lifecycle 处于 STARTED 状态（用户可见）时才收集数据
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -47,16 +47,16 @@ class ShoppingCartActivity : AppCompatActivity() {
         adapter.apply {
             onMinus = { goods ->
                 if (goods.quantity == 1) {
-                    viewModel.todoIntent(ShoppingCartIntent.deleteGoods(goods))
+                    viewModel.todoIntent(ShoppingCartIntent.DeleteGoods(goods))
                 } else if (goods.quantity > 0) {
-                    viewModel.todoIntent(ShoppingCartIntent.updateQuantity(goods.id, - 1))
+                    viewModel.todoIntent(ShoppingCartIntent.UpdateQuantity(goods.id, - 1))
                 }
             }
             onAdd = { goods ->
                 if (goods.quantity == 0) {
-                    viewModel.todoIntent(ShoppingCartIntent.addGoods(goods))
+                    viewModel.todoIntent(ShoppingCartIntent.AddGoods(goods))
                 } else if (goods.stock > 0) {
-                    viewModel.todoIntent(ShoppingCartIntent.updateQuantity(goods.id, + 1))
+                    viewModel.todoIntent(ShoppingCartIntent.UpdateQuantity(goods.id, + 1))
                 }
             }
         }
